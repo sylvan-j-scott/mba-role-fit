@@ -1,5 +1,7 @@
 # Finding a company's job board
 
+Technical details (endpoints, vendor shares, traps, adding a vendor) live in `board-apis.md`.
+
 **Most companies rent their job board, and that software publishes every open role as public,
 no-login JSON.** These feeds exist so the company's own careers page and job aggregators can read
 them. You almost never need to scrape a careers page.
@@ -23,6 +25,9 @@ them. You almost never need to scrape a careers page.
    | `ats.rippling.com/{co}` | Rippling |
    | `{co}.bamboohr.com` | BambooHR |
    | `{tenant}.wd{N}.myworkdayjobs.com/{site}` | Workday (most large companies: CPG, banks, retailers, industrials) |
+   | `wdN.myworkdaysite.com/recruiting/{tenant}/{site}` | Workday (alternate host) |
+   | `*.oraclecloud.com/hcmUI/CandidateExperience/.../sites/{site}` | Oracle Recruiting Cloud |
+   | branded careers site with `/widgets` calls | Phenom. **Check the posting's Apply link first**: it often points at the real Workday or Oracle board |
    | `amazon.jobs` | Amazon's own |
    | `?gh_jid=123` on the company's own domain | Greenhouse, embedded. Use step 3 |
 

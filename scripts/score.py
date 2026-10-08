@@ -65,6 +65,19 @@ def pct(v, q):
     return v[min(len(v) - 1, int(q * len(v)))] if v else 0
 
 
+def company_pct(roles, q):
+    """Fit cutoff where every company gets an equal vote. A plain percentile lets the biggest
+    employer set the bar: with Amazon at 94% of postings, 'top 10%' meant 'top 10% of Amazon'."""
+    n = collections.Counter(r['company'] for r in roles)
+    pts = sorted((r['fit'], 1 / n[r['company']]) for r in roles)
+    total, run = sum(w for _, w in pts), 0
+    for f, w in pts:
+        run += w
+        if run >= q * total:
+            return f
+    return pts[-1][0] if pts else 0
+
+
 def band(n):
     return 'trustworthy' if n >= 100 else ('directional' if n >= 40 else 'UNDER-SAMPLED')
 
@@ -122,7 +135,7 @@ def load(ws, crit, discs):
         raise SystemExit(f"No roles left (dropped: {dict(dropped)}). Run fetch.py, widen disciplines, "
                          f"or loosen the location setting.")
     meta = dict(bank=bank, weight=weight, rec_terms=rec_terms, loc_desc=loc_desc, dropped=dropped,
-                max_years=max_years, P90=pct([r['fit'] for r in roles], .9))
+                max_years=max_years, P90=company_pct(roles, .9))
     return roles, meta
 
 
@@ -131,7 +144,7 @@ def header(title, roles, m):
     out = [f"# {title}\n",
            f"{len(roles)} roles · {len({r['company'] for r in roles})} companies · bank: {len(m['bank'])} records, "
            f"{len(m['weight'])} keywords · reach = not above MBA level and stated minimum ≤ {m['max_years']} yrs · "
-           f"corpus p90 fit = {m['P90']:.1f}\n",
+           f"top-10% cutoff (each company weighted equally) = {m['P90']:.1f}\n",
            f"**Location:** {m['loc_desc']} · kept {geo['us']} US, {geo['intl']} international, {geo['unknown']} "
            f"unplaceable · dropped {m['dropped']['location filter']} by location, "
            f"{m['dropped']['no description']} with no description\n"]
@@ -152,27 +165,33 @@ def slice_rows(roles, d, P90):
     rows = []
     for s, rs in by.items():
         rch = [r for r in rs if r['reach']]
-        rows.append(dict(slice=s, d=d, rs=rs, rch=rch, hi=[r for r in rch if r['fit'] > P90],
+        hi = [r for r in rch if r['fit'] > P90]
+        rows.append(dict(slice=s, d=d, rs=rs, rch=rch, hi=hi, hico=len({r['company'] for r in hi}),
                          med=pct([r['fit'] for r in rch] or [0], .5)))
-    return sorted(rows, key=lambda x: (-len(x['hi']), -x['med']))
+    return sorted(rows, key=RANK)
+
+
+# Rank by how many COMPANIES have a reachable top-10% role, then by how many roles. Sixteen roles at
+# one employer is one org chart; three companies wanting the same shape is a segment.
+RANK = lambda x: (-x['hico'], -len(x['hi']), -x['med'])  # noqa: E731
 
 
 # ---------- Q1 ----------
 def q_where(roles, m, discs, crit):
     core = crit.get('core')
     out = header("Q1. Where do I fit?", roles, m)
-    out.append(f"Every slice in every swept discipline, ranked by reachable roles above the corpus p90 fit."
+    out.append(f"Every slice in every swept discipline, ranked by how many companies have a reachable top-10% role, then by how many such roles."
                + (f" ★ = home discipline ({core})." if core else "") +
                " Your bank is written in your home discipline's words, so a non-home slice ranking high is a "
                "strong signal.\n")
-    out.append("| # | slice | postings | companies | reachable | high-fit & reachable | median fit (reachable) | best match | band |")
-    out.append("|---|---|---|---|---|---|---|---|---|")
-    rows = sorted([x for d in discs for x in slice_rows(roles, d, m['P90'])], key=lambda x: (-len(x['hi']), -x['med']))
+    out.append("| # | slice | postings | companies | reachable | high-fit & reachable | companies with one | median fit (reachable) | best match | band |")
+    out.append("|---|---|---|---|---|---|---|---|---|---|")
+    rows = sorted([x for d in discs for x in slice_rows(roles, d, m['P90'])], key=RANK)
     for i, x in enumerate(rows[:25], 1):
         best = max(x['rch'] or x['rs'], key=lambda r: r['fit'])
         star = ' ★' if x['d']['name'] == core else ''
         out.append(f"| {i} | {x['slice']}{star} | {len(x['rs'])} | {len({r['company'] for r in x['rs']})} | "
-                   f"{len(x['rch'])} | {len(x['hi'])} | {x['med']:.1f} | {best['company']}: {best['title'][:45]} | "
+                   f"{len(x['rch'])} | {len(x['hi'])} | {x['hico']} | {x['med']:.1f} | {best['company']}: {best['title'][:45]} | "
                    f"{band(len(x['rs']))} |")
     out.append("\n**Top reachable roles overall**\n")
     out += [role_line(r) for r in sorted([r for r in roles if r['reach']], key=lambda r: -r['fit'])[:15]]
@@ -192,7 +211,7 @@ def q_companies(roles, m, d):
         rch = [r for r in item[1] if r['reach']]
         return (-sum(r['fit'] > m['P90'] for r in rch), -pct([r['fit'] for r in rch] or [0], .5))
 
-    out.append("Ranked by reachable roles above the corpus p90 fit, then median fit. A company with 1-2 roles "
+    out.append("Ranked by reachable roles above the top-10% cutoff, then median fit. A company with 1-2 roles "
                "is a data point, not a pattern.\n")
     out.append("| company | roles | reachable | median fit | high-fit & reachable | slices they hire for | best reachable role |")
     out.append("|---|---|---|---|---|---|---|")

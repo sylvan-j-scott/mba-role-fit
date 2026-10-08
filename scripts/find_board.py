@@ -23,7 +23,9 @@ PATTERNS = [
     ('smartrecruiters', r'(?:jobs|careers)\.smartrecruiters\.com/([\w-]+)'),
     ('rippling', r'ats\.rippling\.com/([\w-]+)'),
     ('bamboohr', r'([\w-]+)\.bamboohr\.com'),
-    ('workday', r'([\w-]+)\.(wd\d+)\.myworkdayjobs\.com/(?:[a-z]{2}-[A-Z]{2}/)?([\w-]+)'),
+    ('workday', r'([\w-]+)\.(wd\d+)\.myworkdayjobs\.com/(?:[a-zA-Z]{2}-[a-zA-Z]{2}/)?([\w-]+)'),
+    ('workday-site', r'(wd\d+)\.myworkdaysite\.com/(?:[a-zA-Z]{2}-[a-zA-Z]{2}/)?recruiting/([\w-]+)/([\w-]+)'),
+    ('oracle', r'([\w.-]+)/hcmUI/CandidateExperience/[a-z]{2}/sites/([\w-]+)'),
     ('amazon', r'amazon\.jobs'),
 ]
 
@@ -51,8 +53,13 @@ def count(vendor, b):
         if vendor == 'bamboohr':
             return len(fetch(f"https://{b['board']}.bamboohr.com/careers/list").get('result', []))
         if vendor == 'workday':
-            base = f"https://{b['tenant']}.{b['wd']}.myworkdayjobs.com/wday/cxs/{b['tenant']}/{b['site']}"
+            host = b.get('host') or f"{b['tenant']}.{b['wd']}.myworkdayjobs.com"
+            base = f"https://{host}/wday/cxs/{b['tenant']}/{b['site']}"
             return fetch(base + '/jobs', {"appliedFacets": {}, "limit": 1, "offset": 0, "searchText": ""}).get('total', 0)
+        if vendor == 'oracle':
+            d = fetch(f"https://{b['host']}/hcmRestApi/resources/latest/recruitingCEJobRequisitions?onlyData=true"
+                      f"&expand=requisitionList&finder=findReqs;siteNumber={b['site']},limit=1")
+            return (d.get('items') or [{}])[0].get('TotalJobsCount', 0)
         if vendor == 'amazon':
             return fetch("https://www.amazon.jobs/en/search.json?result_limit=1").get('hits', 0)
     except (urllib.error.URLError, urllib.error.HTTPError, ValueError, TimeoutError):
@@ -68,6 +75,11 @@ def from_url(url, company):
             return None, "Greenhouse embedded on the company's own site. Try --name with the company name."
         if vendor == 'workday':
             b = {'tenant': m.group(1), 'wd': m.group(2), 'site': m.group(3)}
+        elif vendor == 'workday-site':  # {wd}.myworkdaysite.com/recruiting/{tenant}/{site}
+            vendor, b = 'workday', {'tenant': m.group(2), 'wd': m.group(1), 'site': m.group(3),
+                                    'host': f'{m.group(1)}.myworkdaysite.com'}
+        elif vendor == 'oracle':
+            b = {'host': m.group(1), 'site': m.group(2)}
         elif vendor == 'amazon':
             b = {}
         else:

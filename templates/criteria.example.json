@@ -3,7 +3,6 @@
  "core_note": "The discipline they come from or most expect to target. Gets the companies-by-fit table.",
  "disciplines": [
   "product",
-  "consulting",
   "finance",
   "marketing",
   "operations",

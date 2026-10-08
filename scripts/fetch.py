@@ -16,7 +16,7 @@ Location is NOT filtered here. The archive keeps every place; score.py applies t
 setting, so changing it never needs a re-fetch.
 Prints counts only. Never prints raw job text.
 """
-import argparse, glob, hashlib, html, json, os, re, sys, time
+import argparse, concurrent.futures, glob, hashlib, html, json, os, re, sys, time
 import urllib.error, urllib.parse, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -52,7 +52,15 @@ class Http:
                 hdr['Content-Type'] = 'application/json'
             req = urllib.request.Request(url, data=data, headers=hdr,
                                          method='POST' if data else 'GET')
-            raw = urllib.request.urlopen(req, timeout=40).read().decode('utf-8', 'ignore')
+            # Big boards (Workday especially) throw 429/5xx under load. Back off and retry, don't give up.
+            for attempt in range(4):
+                try:
+                    raw = urllib.request.urlopen(req, timeout=40).read().decode('utf-8', 'ignore')
+                    break
+                except urllib.error.HTTPError as e:
+                    if e.code not in (429, 500, 502, 503, 504) or attempt == 3:
+                        raise
+                    time.sleep(3 * 2 ** attempt)
             with open(p, 'w', encoding='utf-8') as f:
                 f.write(raw)
             time.sleep(0.4)
@@ -158,7 +166,9 @@ def bamboohr(http, b, keep, terms, cap):
 
 def workday(http, b, keep, terms, cap):
     # searchText is fuzzy OR-matching, so its hit counts mean nothing. Filter on titles here.
-    base = f"https://{b['tenant']}.{b['wd']}.myworkdayjobs.com/wday/cxs/{b['tenant']}/{b['site']}"
+    # Most tenants live on {tenant}.{wd}.myworkdayjobs.com; some on {wd}.myworkdaysite.com ('host').
+    host = b.get('host') or f"{b['tenant']}.{b['wd']}.myworkdayjobs.com"
+    base = f"https://{host}/wday/cxs/{b['tenant']}/{b['site']}"
     found = {}
     # Under ~2,500 jobs, one pass over the whole board is cheaper than 19 fuzzy searches that each
     # page through most of it anyway. Bigger boards fall back to per-term search.
@@ -202,8 +212,97 @@ def amazon(http, b, keep, terms, cap):
                 break
 
 
+def phenom(http, b, keep, terms, cap):
+    """Phenom career sites (careers.{co}.com/widgets). One list pass over the US board, then a detail
+    call per kept title. Many Phenom sites front a Workday or Oracle board; prefer those when known."""
+    base = dict(lang='en_us', deviceType='desktop', country='us', siteType='external')
+    url = f"https://{b['host']}/widgets"
+    found = {}
+    for off in range(0, 5000, 50):
+        d = http.get(url, dict(base, pageName='search-results', ddoKey='refineSearch', size=50, jobs=True,
+                               keywords=b.get('keywords', ''), selected_fields={}, sortBy='', subsearch='',
+                               clearAll=False, jdsource='facets', isSliderEnable=False, locationData={},
+                               counts=False, **{'from': off}))
+        jobs = ((d.get('refineSearch') or {}).get('data') or {}).get('jobs') or []
+        for j in jobs:
+            if keep(j.get('title', '')):
+                found.setdefault(j['jobSeqNo'], j)
+        if len(jobs) < 50:
+            break
+    for seq, j in list(found.items())[:cap]:
+        dd = http.get(url, dict(base, pageName='job', ddoKey='jobDetail', jobId=j.get('jobId'), jobSeqNo=seq))
+        job = ((dd.get('jobDetail') or {}).get('data') or {}).get('job') or {}
+        yield row(b['company'], j['title'], f"https://{b['host']}/us/en/job/{j.get('jobId')}",
+                  text(job.get('description', '')), j.get('location', ''), j.get('postedDate', ''),
+                  j.get('category', ''), 'phenom')
+
+
+def oracle(http, b, keep, terms, cap):
+    """Oracle Recruiting Cloud (…/hcmRestApi). Public list + detail endpoints, no login."""
+    api = f"https://{b['host']}/hcmRestApi/resources/latest"
+    found = {}
+    for off in range(0, 5000, 100):
+        d = http.get(f"{api}/recruitingCEJobRequisitions?onlyData=true&expand=requisitionList&finder=findReqs;"
+                     f"siteNumber={b['site']},limit=100,offset={off},sortBy=POSTING_DATES_DESC")
+        items = (d.get('items') or [{}])[0]
+        reqs = items.get('requisitionList') or []
+        for j in reqs:
+            if keep(j.get('Title', '')):
+                found.setdefault(j['Id'], j)
+        if len(reqs) < 100 or off + 100 >= (items.get('TotalJobsCount') or 0):
+            break
+    for jid, j in list(found.items())[:cap]:
+        x = (http.get(f'{api}/recruitingCEJobRequisitionDetails?expand=all&onlyData=true&finder=ById;'
+                      f'Id=%22{jid}%22,siteNumber={b["site"]}').get('items') or [{}])[0]
+        body = '\n\n'.join(text(x.get(k)) for k in
+                            ('ExternalDescriptionStr', 'ExternalResponsibilitiesStr', 'ExternalQualificationsStr'))
+        yield row(b['company'], j['Title'],
+                  f"https://{b['host']}/hcmUI/CandidateExperience/en/sites/{b['site']}/job/{jid}",
+                  body, j.get('PrimaryLocation', ''), j.get('PostedDate', ''), j.get('JobFamily', ''), 'oracle')
+
+
+def eightfold(http, b, keep, terms, cap):
+    """Eightfold career sites (Microsoft, Starbucks, Netflix). Boards are huge and mostly hourly at
+    some companies, so search per discipline term like Amazon. Newer sites answer /api/pcsx/*, older
+    ones /api/apply/v2/*; try pcsx and fall back."""
+    host, dom = b['host'], b['domain']
+    api = b.get('api', 'pcsx')
+    found = {}
+    for q in terms:
+        start = 0
+        while start < 300:
+            qs = urllib.parse.urlencode({'domain': dom, 'query': q, 'start': start, 'num': 50, 'location': b.get('location', 'United States')})
+            try:
+                d = http.get(f"https://{host}/api/{'pcsx/search' if api == 'pcsx' else 'apply/v2/jobs'}?{qs}")
+            except urllib.error.HTTPError as e:
+                if e.code == 403 and api == 'pcsx':
+                    api = 'v2'
+                    continue
+                raise
+            d = d.get('data', d)
+            pos = d.get('positions') or []
+            for j in pos:
+                if keep(j.get('name', '')):
+                    found.setdefault(j['id'], j)
+            start += len(pos)
+            if not pos or start >= (d.get('count') or 0):
+                break
+    for jid, j in list(found.items())[:cap]:
+        path = (f"pcsx/position_details?position_id={jid}&domain={dom}&hl=en" if api == 'pcsx'
+                else f"apply/v2/jobs/{jid}?domain={dom}")
+        x = http.get(f"https://{host}/api/{path}")
+        x = x.get('data', x)
+        loc = j.get('location') or ', '.join((j.get('locations') or [])[:2])
+        ts = j.get('postedTs') or x.get('t_create') or x.get('t_update')  # v2 sites have no postedTs
+        posted = time.strftime('%Y-%m-%d', time.gmtime(ts)) if ts else ''
+        yield row(b['company'], j['name'], j.get('canonicalPositionUrl') or f"https://{host}/careers/job/{jid}",
+                  text(x.get('job_description') or x.get('jobDescription') or ''), loc, posted,
+                  j.get('department') or '', 'eightfold')
+
+
 VENDORS = {'greenhouse': greenhouse, 'lever': lever, 'ashby': ashby, 'smartrecruiters': smartrecruiters,
-           'rippling': rippling, 'bamboohr': bamboohr, 'workday': workday, 'amazon': amazon}
+           'rippling': rippling, 'bamboohr': bamboohr, 'workday': workday, 'amazon': amazon,
+           'phenom': phenom, 'oracle': oracle, 'eightfold': eightfold}
 
 
 # ---------- postings saved by hand ----------
@@ -231,6 +330,7 @@ def main():
     ap.add_argument('--workspace', required=True)
     ap.add_argument('--max-age', type=float, default=20, help='hours before a cached response is refetched')
     ap.add_argument('--cap', type=int, default=150, help='max detail fetches per company (Workday, SmartRecruiters)')
+    ap.add_argument('--workers', type=int, default=6, help='boards fetched at once')
     ap.add_argument('--only', help='comma list of company names to fetch this run')
     a = ap.parse_args()
     ws = os.path.expanduser(a.workspace)
@@ -268,25 +368,40 @@ def main():
         arch[k] = r
         return 1
 
-    print(f"disciplines: {', '.join(d['name'] for d in discs)}   boards: {len(boards)}")
-    for b in boards:
-        fn = VENDORS.get(b['type'])
-        if not fn or b.get('fetch') == 'manual':
-            print(f"  {b['company']:24s} skipped ({b['type']}: search by hand, save to manual/)")
-            continue
-        n = 0
+    def save():
+        tmp = arch_p + '.tmp'
+        with open(tmp, 'w', encoding='utf-8') as f:
+            for r in arch.values():
+                f.write(json.dumps(r, ensure_ascii=False) + '\n')
+        os.replace(tmp, arch_p)
+
+    def pull(b):
+        rows, err = [], None
         try:
-            for r in fn(http, b, keep, terms, a.cap):
-                n += add(r)
-            print(f"  {b['company']:24s} {n:4d} matching roles  ({b['type']})")
-        except (urllib.error.URLError, urllib.error.HTTPError, ValueError, KeyError, TimeoutError) as e:
-            print(f"  {b['company']:24s} ERROR {type(e).__name__}: {str(e)[:80]}  ({n} kept before error)")
+            for r in VENDORS[b['type']](http, b, keep, terms, a.cap):
+                rows.append(r)
+        except (urllib.error.URLError, urllib.error.HTTPError, ValueError, KeyError, TimeoutError, OSError) as e:
+            err = f"{type(e).__name__}: {str(e)[:80]}"
+        return b, rows, err
+
+    print(f"disciplines: {', '.join(d['name'] for d in discs)}   boards: {len(boards)}")
+    todo = []
+    for b in boards:
+        if b['type'] not in VENDORS or b.get('fetch') == 'manual':
+            print(f"  {b['company']:24s} skipped ({b['type']}: search by hand, save to manual/)")
+        else:
+            todo.append(b)
+    # Boards run in parallel (each board stays sequential, so no single site is hit hard).
+    # The archive is saved after every board, so stopping mid-run loses nothing already pulled.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=a.workers) as ex:
+        for b, rows, err in (f.result() for f in concurrent.futures.as_completed([ex.submit(pull, b) for b in todo])):
+            n = sum(add(r) for r in rows)
+            note = f"ERROR {err}  ({n} kept before error)" if err else f"{n:4d} matching roles  ({b['type']})"
+            print(f"  {b['company']:24s} {note}", flush=True)
+            save()
     m = sum(add(r) for r in manual(ws))
     print(f"  {'manual/ folder':24s} {m:4d} postings")
-
-    with open(arch_p, 'w', encoding='utf-8') as f:
-        for r in arch.values():
-            f.write(json.dumps(r, ensure_ascii=False) + '\n')
+    save()
     live = sum(1 for r in arch.values() if r['last_seen'] == TODAY)
     print(f"\narchive: {len(arch)} postings ({live} seen today, {len(arch) - live} seen on earlier runs only)")
 

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where You Fit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page: #F3F5F7;
+  --sheet: #FFFFFF;
+  --ink: #17202C;
+  --muted: #5B6675;
+  --faint: #9AA3AE;
+  --rule: #DCE1E6;
+  --mark: #F2D544;
+  --mark-soft: #FBF1B8;
+  --warn: #A3321F;
+  --warn-bg: #FAECE8;
+  --serif: "Newsreader", Georgia, serif;
+  --sans: "Public Sans", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #12161C; --sheet: #1A2028; --ink: #E7EAEE; --muted: #A2ABB6; --faint: #5E6874;
+    --rule: #2C343E; --mark: #E3C73A; --mark-soft: #3B3517; --warn: #F08A74; --warn-bg: #3A211C;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #12161C; --sheet: #1A2028; --ink: #E7EAEE; --muted: #A2ABB6; --faint: #5E6874;
+  --rule: #2C343E; --mark: #E3C73A; --mark-soft: #3B3517; --warn: #F08A74; --warn-bg: #3A211C;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 15px/1.5 var(--sans);
+  font-variant-numeric: tabular-nums; }
+main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.kicker { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+h1 { font: 500 clamp(32px, 5vw, 46px)/1.1 var(--serif); letter-spacing: -.01em; margin: 0 0 14px; max-width: 18ch; }
+.support { font-size: 17px; max-width: 62ch; margin: 0 0 8px; }
+.support b { font-weight: 600; }
+.warn { margin: 22px 0 0; padding: 12px 16px; background: var(--warn-bg); border-left: 3px solid var(--warn);
+  max-width: 70ch; }
+.warn b { color: var(--warn); }
+.trust { color: var(--muted); font-size: 13px; margin: 14px 0 0; max-width: 80ch; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: end; margin: 44px 0 16px; }
+.group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.seg { display: flex; flex-wrap: wrap; gap: 4px; }
+.seg button { border: 1px solid var(--rule); background: var(--sheet); padding: 5px 11px; border-radius: 999px;
+  cursor: pointer; font-size: 14px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--page); border-color: var(--ink); }
+
+.map { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; }
+.axis, .row-head { display: grid; grid-template-columns: minmax(150px, 230px) 1fr 128px; gap: 16px;
+  align-items: center; padding: 0 16px; }
+.axis { padding-top: 14px; padding-bottom: 8px; font-size: 12px; color: var(--muted);
+  border-bottom: 1px solid var(--rule); }
+.scale { position: relative; height: 32px; }
+.scale span { position: absolute; bottom: 0; transform: translateX(-50%); }
+.scale .zone-label { bottom: 16px; left: 95%; white-space: nowrap; color: var(--ink); font-weight: 500; }
+.axis .right { text-align: right; }
+
+.row { border-bottom: 1px solid var(--rule); }
+.row:last-child { border-bottom: 0; }
+.row-head { width: 100%; border: 0; background: none; text-align: left; padding-top: 10px; padding-bottom: 10px;
+  cursor: pointer; }
+.row-head:hover { background: color-mix(in srgb, var(--page) 60%, transparent); }
+.name { font-weight: 500; line-height: 1.3; }
+.name small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+.name .thin { font-style: italic; }
+.strip { position: relative; height: 30px; }
+.strip::before { content: ""; position: absolute; inset: 0 0 0 90%; background: var(--mark-soft); border-radius: 2px; }
+.strip .base { position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--rule); }
+.dot { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; }
+.dot.out { border: 1px solid var(--faint); background: transparent; }
+.dot.in { background: var(--muted); }
+.dot.hi { background: var(--mark); box-shadow: 0 0 0 1px var(--ink); width: 8px; height: 8px; margin: -4px 0 0 -4px; }
+.count { text-align: right; font-size: 13px; color: var(--muted); }
+.count b { display: block; font-size: 18px; color: var(--ink); font-weight: 600; }
+
+.detail { display: none; padding: 6px 16px 24px; }
+.row.open .detail { display: grid; grid-template-columns: 1.6fr 1fr; gap: 28px; }
+.row.open .row-head { background: color-mix(in srgb, var(--page) 60%, transparent); }
+.detail h3 { font: 600 13px/1.4 var(--sans); margin: 14px 0 8px; color: var(--muted); }
+.roles { list-style: none; margin: 0; padding: 0; }
+.roles li { display: grid; grid-template-columns: 70px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--rule); }
+.roles li:first-child { border-top: 0; }
+.pct { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.pct.hi { background: var(--mark); color: #17202C; font-weight: 600; padding: 0 6px; border-radius: 2px;
+  justify-self: start; align-self: start; }
+.roles a { font-weight: 500; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+.roles a:hover { text-decoration-color: var(--ink); }
+.roles .sub, details.every .sub { font-size: 12.5px; color: var(--muted); }
+.recs, .gaps { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+.recs li { padding: 3px 0; display: flex; justify-content: space-between; gap: 12px; }
+.recs li span:last-child { color: var(--muted); }
+.gaps { display: flex; flex-wrap: wrap; gap: 6px; }
+.gaps li { border: 1px dashed var(--faint); border-radius: 3px; padding: 1px 7px; font-size: 13px; }
+.gaps li span { color: var(--muted); }
+.hint { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+.more { margin: 12px 16px 16px; border: 0; background: none; text-decoration: underline; cursor: pointer;
+  color: var(--muted); padding: 0; }
+
+footer { margin-top: 48px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; font-size: 13.5px;
+  color: var(--muted); }
+footer h4 { color: var(--ink); font: 600 14px/1.4 var(--sans); margin: 0 0 4px; }
+footer p { margin: 0; }
+
+@media (max-width: 700px) {
+  main { padding: 28px 16px 60px; }
+  .axis, .row-head { grid-template-columns: 1fr 64px; }
+  .axis > :first-child { display: none; }
+  .strip, .scale { grid-column: 1 / -1; grid-row: 2; }
+  .row.open .detail { grid-template-columns: 1fr; gap: 8px; }
+  footer { grid-template-columns: 1fr; }
+}
+details.every { margin-top: 18px; }
+details.every summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+details.every ul { list-style: none; padding: 0; margin: 10px 0 0; max-height: 420px; overflow-y: auto; }
+details.every li { display: grid; grid-template-columns: 70px 1fr; gap: 0 10px; padding: 6px 0; font-size: 14px; border-top: 1px solid var(--rule); }
+details.every li .sub { grid-column: 2; }
+</style>
+</head>
+<body>
+<main>
+  <p class="kicker" id="kicker"></p>
+  <h1 id="verdict"></h1>
+  <p class="support" id="support"></p>
+  <div id="warn"></div>
+  <p class="trust" id="trust"></p>
+
+  <div class="controls">
+    <div class="group"><label id="disc-label">Discipline</label><div class="seg" id="discs" role="group" aria-labelledby="disc-label"></div></div>
+    <div class="group"><label id="by-label">Group postings by</label><div class="seg" id="by" role="group" aria-labelledby="by-label"></div></div>
+  </div>
+
+  <section class="map" aria-label="Fit map">
+    <div class="axis" aria-hidden="true">
+      <div id="axis-name">Role type</div>
+      <div class="scale">
+        <span style="left:0">0</span><span style="left:50%">50</span><span style="left:90%">90</span><span style="left:100%">100</span>
+        <span class="zone-label">your top 10%</span>
+      </div>
+      <div class="right" id="count-name">companies with a reachable top-10% role</div>
+    </div>
+    <div id="rows"></div>
+  </section>
+
+  <footer>
+    <div><h4>Reading a dot</h4><p>One dot is one posting. Further right means it asks for more of what your record shows. Yellow dots are in your top 10% and you can be hired into them. Hollow dots ask for more years or a higher level than you have.</p></div>
+    <div><h4>Sample size</h4><p>100+ postings in a row: trust the pattern. 40 to 99: a direction. Under 40 is marked thin: read the roles one by one.</p></div>
+    <div><h4>What fit is not</h4><p>Fit is word overlap with your evidence bank, ranked within this sweep. It compares rows on this page. It doesn't compare you with anyone else, and it isn't a hiring prediction.</p></div>
+  </footer>
+</main>
+
+<script>
+const DATA = /*__DATA__*/null;
+const M = DATA.meta, R = DATA.roles;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const label = Object.fromEntries(M.discs);
+const pctText = p => `top ${Math.max(1, 100 - p)}%`;
+let state = { disc: 'all', by: 'slices', showAll: false, open: null };
+try { Object.assign(state, JSON.parse(localStorage.getItem('rolefit-view') || '{}'), { open: null, showAll: false }); } catch (e) {}
+
+function stats(row) {
+  const rs = row.ids.map(i => R[i]);
+  const hi = rs.filter(r => r.h).length;
+  const reach = rs.filter(r => r.r).map(r => r.p).sort((a, b) => a - b);
+  const hico = new Set(rs.filter(r => r.h).map(r => r.c)).size;
+  return { rs, hi, hico, n: rs.length, med: reach.length ? reach[Math.floor(reach.length / 2)] : 0 };
+}
+const isOther = s => /: other$/i.test(s);
+const nice = s => s.replace(/: other$/i, ': general titles');
+const shortSlice = s => s.replace(/^[^:]+:\s*/, '');
+
+function verdict() {
+  const ranked = M.discs.map(([k]) => [k, DATA.views[k]]).sort((a, b) => b[1].cos - a[1].cos || b[1].hi - a[1].hi);
+  const [bestK, best] = ranked[0];
+  const slices = best.slices.filter(s => !isOther(s.label)).map(s => [s, stats(s)]).sort((a, b) => b[1].hico - a[1].hico || b[1].hi - a[1].hi);
+  const top = slices[0];
+  document.getElementById('kicker').textContent =
+    `Where you fit · ${M.n.toLocaleString()} postings from ${M.cos} companies · ${M.loc.replace(/ \+ unplaceable \(flagged\)/, '')}${M.unk ? `, plus ${M.unk} with no clear location` : ''}`;
+  document.getElementById('verdict').textContent = `${label[bestK]} fits you best.`;
+  const runners = ranked.slice(1, 3).filter(([, v]) => v.hi > 0).map(([k]) => label[k].toLowerCase());
+  document.getElementById('support').innerHTML =
+    `<b>${best.hi}</b> roles you can be hired into rank in your top 10%, at ${best.cos} ${best.cos === 1 ? 'company' : 'companies'}.` +
+    (top ? ` The strongest type is <b>${esc(nice(shortSlice(top[0].label)))}</b>: ${top[1].hico} ${top[1].hico === 1 ? 'company has' : 'companies have'} a role like this you could land.` : '') +
+    (runners.length ? ` Next best: ${runners.join(' and ')}.` : '');
+  if (M.top_share > .4) document.getElementById('warn').innerHTML =
+    `<p class="warn"><b>${esc(M.top_co)} is ${Math.round(M.top_share * 100)}% of these postings.</b> ` +
+    `Treat this as a read on ${esc(M.top_co)} until more companies are added. Ask Claude to add boards, then rerun.</p>`;
+  document.getElementById('trust').textContent =
+    `Reachable means the title is MBA level or below and any stated minimum is ${M.max_years} years or less. ` +
+    `Matched against ${M.bank} records in your bank. ${M.dropped_loc} postings were outside your location setting` +
+    (M.unk ? `; ${M.unk} kept that list no clear location.` : '.');
+}
+
+function controls() {
+  const discs = [['all', 'All'], ...M.discs];
+  document.getElementById('discs').innerHTML = discs.map(([k, l]) =>
+    `<button data-k="${k}" aria-pressed="${state.disc === k}">${esc(l)}${k === M.core ? ' ★' : ''}</button>`).join('');
+  document.getElementById('by').innerHTML = [['slices', 'Role type'], ['companies', 'Company']].map(([k, l]) =>
+    `<button data-k="${k}" aria-pressed="${state.by === k}">${l}</button>`).join('');
+  document.getElementById('axis-name').textContent = state.by === 'slices' ? 'Role type' : 'Company';
+  document.getElementById('count-name').textContent = state.by === 'slices' ? 'companies with a reachable top-10% role' : 'reachable top-10% roles';
+}
+
+function strip(rs) {
+  return `<div class="strip" aria-hidden="true"><div class="base"></div>` + rs.map(r => {
+    const jit = 22 + ((r.p * 7 + r.t.length * 13) % 56);
+    const cls = r.h ? 'hi' : r.r ? 'in' : 'out';
+    return `<i class="dot ${cls}" style="left:${r.p}%;top:${jit}%"></i>`;
+  }).join('') + `</div>`;
+}
+
+const ALL_CAP = 300;
+function all(rs) {
+  const items = rs.slice(0, ALL_CAP).map(r => `<li><span class="pct ${r.h ? 'hi' : ''}">${pctText(r.p)}</span>
+      <a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)}</a>
+      <span class="sub">${esc(r.c)}${r.r ? '' : ' · out of reach'}${r.y != null ? ` · ${r.y}+ yrs` : ''}</span></li>`).join('');
+  return `<details class="every"><summary>Every posting here (${rs.length})</summary><ul>${items}</ul>
+    ${rs.length > ALL_CAP ? `<p class="hint">Showing the ${ALL_CAP} best fits. The rest are in postings.jsonl in your workspace.</p>` : ''}</details>`;
+}
+
+function detail(row, s) {
+  const best = s.rs.filter(r => r.r).slice(0, 8);
+  const roles = best.map(r => `<li><span class="pct ${r.h ? 'hi' : ''}">${pctText(r.p)}</span><div>
+      <a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)}</a>
+      <div class="sub">${esc(r.c)}${r.y != null ? ` · asks for ${r.y}+ yrs` : ''}${r.g !== 'us' ? ' · location unclear' : ''}${r.a.length ? ' · ' + esc(r.a.join(', ')) : ''}</div>
+      ${r.k.length ? `<div class="sub">Matches: ${esc(r.k.join('; '))}</div>` : ''}</div></li>`).join('');
+  const recs = row.recs.length ? `<ul class="recs">${row.recs.map(([t, c]) =>
+      `<li><span>${esc(t)}</span><span>${c} of ${Math.min(50, s.n)}</span></li>`).join('')}</ul><p class="hint">Counted across the ${Math.min(50, s.n)} best-fitting postings here.</p>`
+    : `<p class="hint">No single record carries these roles.</p>`;
+  const gaps = row.gaps.length ? `<ul class="gaps">${row.gaps.map(([t, sh]) =>
+      `<li>${esc(t)} <span>${Math.round(sh * 100)}%</span></li>`).join('')}</ul>
+      <p class="hint">Done any of these? Tell Claude and it goes in your bank.</p>`
+    : `<p class="hint">None show up in more than 15% of these postings.</p>`;
+  return `<div class="detail"><div><h3>Best roles you can be hired into</h3>
+      ${roles ? `<ul class="roles">${roles}</ul>` : '<p class="hint">None within reach in this group.</p>'}
+      ${s.n < 40 ? `<p class="hint">Only ${s.n} postings here. Read them one by one rather than trusting the pattern.</p>` : ''}
+      ${all(s.rs)}</div>
+    <div><h3>Your records these roles lean on</h3>${recs}
+      <h3>Words these postings use that your bank doesn't</h3>${gaps}</div></div>`;
+}
+
+function render() {
+  const view = DATA.views[state.disc];
+  const rows = view[state.by].map(r => [r, stats(r)])
+    .sort((a, b) => b[1].hico - a[1].hico || b[1].hi - a[1].hi || b[1].med - a[1].med || b[1].n - a[1].n);
+  const shown = state.showAll ? rows : rows.slice(0, 12);
+  document.getElementById('rows').innerHTML = shown.map(([row, s], i) => {
+    const sub = state.by === 'slices'
+      ? `${s.n} postings · ${row.cos} ${row.cos === 1 ? 'company' : 'companies'}${s.n < 40 ? ' · <span class="thin">thin</span>' : ''}`
+      : `${s.n} postings${s.n < 40 ? ' · <span class="thin">thin</span>' : ''}`;
+    const nm = state.by === 'companies' ? row.label : state.disc === 'all' ? nice(row.label) : nice(shortSlice(row.label));
+    const star = state.by === 'slices' && row.disc === M.core && state.disc === 'all' ? ' ★' : '';
+    const id = `${state.disc}|${state.by}|${row.label}`;
+    return `<div class="row ${state.open === id ? 'open' : ''}" data-id="${esc(id)}">
+      <button class="row-head" aria-expanded="${state.open === id}">
+        <span class="name">${esc(nm)}${star}<small>${sub}</small></span>
+        ${strip(s.rs)}
+        <span class="count">${state.by === 'slices' ? `<b>${s.hico}</b>${s.hico === 1 ? 'company' : 'companies'} · ${s.hi} roles` : `<b>${s.hi}</b>of ${s.n}`}</span>
+      </button>${state.open === id ? detail(row, s) : ''}</div>`;
+  }).join('') + (rows.length > 12 && !state.showAll
+      ? `<button class="more" id="more">Show all ${rows.length} ${state.by === 'slices' ? 'role types' : 'companies'}</button>` : '');
+}
+
+document.addEventListener('click', e => {
+  const seg = e.target.closest('.seg button');
+  if (seg) {
+    state[seg.parentElement.id === 'discs' ? 'disc' : 'by'] = seg.dataset.k;
+    state.open = null; state.showAll = false;
+    try { localStorage.setItem('rolefit-view', JSON.stringify({ disc: state.disc, by: state.by })); } catch (err) {}
+    controls(); render(); return;
+  }
+  if (e.target.id === 'more') { state.showAll = true; render(); return; }
+  const head = e.target.closest('.row-head');
+  if (head) { const id = head.parentElement.dataset.id; state.open = state.open === id ? null : id; render(); }
+});
+
+if (!DATA.views[state.disc]) state.disc = 'all';
+verdict(); controls(); render();
+</script>
+</body>
+</html>

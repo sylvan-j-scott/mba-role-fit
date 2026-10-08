@@ -8,20 +8,63 @@
   "smartrecruiters": "GET https://api.smartrecruiters.com/v1/companies/{board}/postings?limit=100&offset=N (+ GET .../postings/{id} for body)",
   "rippling": "GET https://api.rippling.com/platform/api/ats/v1/board/{board}/jobs",
   "bamboohr": "GET https://{board}.bamboohr.com/careers/list (+ /careers/{id}/detail)",
-  "workday": "POST https://{tenant}.{wd}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs body {\"appliedFacets\":{},\"limit\":20,\"offset\":0,\"searchText\":\"\"}",
+  "workday": "POST https://{tenant}.{wd}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs body {\"appliedFacets\":{},\"limit\":20,\"offset\":0,\"searchText\":\"\"}  (some tenants live on {wd}.myworkdaysite.com: set 'host')",
   "amazon": "GET https://www.amazon.jobs/en/search.json?base_query=...&offset=0&result_limit=100",
   "intuit": "jobs.intuit.com/search-jobs/results (TalentBrew HTML) - see daily-job-brief scripts/fetch_a.py fetch_intuit",
-  "microsoft": "apply.careers.microsoft.com/api/pcsx/search - see daily-job-brief scripts/fetch_a.py fetch_microsoft"
+  "phenom": "POST https://{host}/widgets body {ddoKey:\"refineSearch\", from, size, country:\"us\", ...} (+ ddoKey \"jobDetail\" for body)",
+  "oracle": "GET https://{host}/hcmRestApi/resources/latest/recruitingCEJobRequisitions?onlyData=true&expand=requisitionList&finder=findReqs;siteNumber={site},limit=100,offset=N (+ recruitingCEJobRequisitionDetails for body)",
+  "eightfold": "GET https://{host}/api/pcsx/search?domain={domain}&query=Q&start=N&num=50 (+ /api/pcsx/position_details?position_id=ID&domain=...). Older sites: /api/apply/v2/jobs"
  },
  "boards": [
+  {
+   "company": "3M",
+   "type": "workday",
+   "tenant": "3m",
+   "wd": "wd1",
+   "site": "Search"
+  },
+  {
+   "company": "Abbott",
+   "type": "workday",
+   "tenant": "abbott",
+   "wd": "wd5",
+   "site": "abbottcareers"
+  },
+  {
+   "company": "Accenture",
+   "type": "workday",
+   "tenant": "accenture",
+   "wd": "wd103",
+   "site": "AccentureCareers"
+  },
+  {
+   "company": "Adobe",
+   "type": "workday",
+   "tenant": "adobe",
+   "wd": "wd5",
+   "site": "external_experienced"
+  },
   {
    "company": "Airbnb",
    "type": "greenhouse",
    "board": "airbnb"
   },
   {
+   "company": "Ally Financial",
+   "type": "workday",
+   "tenant": "ally",
+   "wd": "wd1",
+   "site": "Ally"
+  },
+  {
    "company": "Amazon",
    "type": "amazon"
+  },
+  {
+   "company": "American Express",
+   "type": "oracle",
+   "host": "egug.fa.us2.oraclecloud.com",
+   "site": "CX_1"
   },
   {
    "company": "AT&T",
@@ -31,9 +74,45 @@
    "site": "ATTGeneral"
   },
   {
+   "company": "Bank of America",
+   "type": "workday",
+   "tenant": "ghr",
+   "wd": "wd1",
+   "site": "lateral-us"
+  },
+  {
    "company": "Bill",
    "type": "greenhouse",
    "board": "billcom"
+  },
+  {
+   "company": "BlackRock",
+   "type": "workday",
+   "tenant": "blackrock",
+   "wd": "wd1",
+   "site": "BlackRock_Professional"
+  },
+  {
+   "company": "Block",
+   "type": "greenhouse",
+   "board": "block"
+  },
+  {
+   "company": "Booz Allen Hamilton",
+   "type": "workday",
+   "tenant": "bah",
+   "wd": "wd1",
+   "site": "BAH_Jobs"
+  },
+  {
+   "company": "Boston Consulting Group",
+   "type": "phenom",
+   "host": "careers.bcg.com"
+  },
+  {
+   "company": "Calm",
+   "type": "greenhouse",
+   "board": "calm"
   },
   {
    "company": "Canva",
@@ -48,6 +127,105 @@
    "site": "Capital_One"
   },
   {
+   "company": "Chewy",
+   "type": "workday",
+   "tenant": "chewy",
+   "wd": "wd5",
+   "site": "External",
+   "host": "wd5.myworkdaysite.com"
+  },
+  {
+   "company": "Chime",
+   "type": "greenhouse",
+   "board": "chime"
+  },
+  {
+   "company": "Cisco",
+   "type": "workday",
+   "tenant": "cisco",
+   "wd": "wd5",
+   "site": "Cisco_Careers"
+  },
+  {
+   "company": "Citi",
+   "type": "workday",
+   "tenant": "citi",
+   "wd": "wd5",
+   "site": "2"
+  },
+  {
+   "company": "Clorox",
+   "type": "workday",
+   "tenant": "clorox",
+   "wd": "wd1",
+   "site": "Clorox",
+   "host": "wd1.myworkdaysite.com"
+  },
+  {
+   "company": "Coca-Cola",
+   "type": "workday",
+   "tenant": "coke",
+   "wd": "wd1",
+   "site": "coca-cola-careers"
+  },
+  {
+   "company": "Coinbase",
+   "type": "greenhouse",
+   "board": "coinbase"
+  },
+  {
+   "company": "Comcast NBCUniversal",
+   "type": "workday",
+   "tenant": "comcast",
+   "wd": "wd115",
+   "site": "Comcast_Careers"
+  },
+  {
+   "company": "Coursera",
+   "type": "greenhouse",
+   "board": "coursera"
+  },
+  {
+   "company": "CVS Health",
+   "type": "workday",
+   "tenant": "cvshealth",
+   "wd": "wd1",
+   "site": "CVS_Health_Careers"
+  },
+  {
+   "company": "Databricks",
+   "type": "greenhouse",
+   "board": "databricks"
+  },
+  {
+   "company": "Datadog",
+   "type": "greenhouse",
+   "board": "datadog"
+  },
+  {
+   "company": "Dell",
+   "type": "oracle",
+   "host": "enterpriseplatform.dell.com",
+   "site": "careers"
+  },
+  {
+   "company": "Disney",
+   "type": "workday",
+   "tenant": "disney",
+   "wd": "wd5",
+   "site": "disneycareer"
+  },
+  {
+   "company": "DoorDash",
+   "type": "greenhouse",
+   "board": "doordashusa"
+  },
+  {
+   "company": "Dropbox",
+   "type": "greenhouse",
+   "board": "dropbox"
+  },
+  {
    "company": "Duolingo",
    "type": "greenhouse",
    "board": "duolingo"
@@ -58,9 +236,45 @@
    "board": "dust"
   },
   {
+   "company": "eBay",
+   "type": "workday",
+   "tenant": "ebay",
+   "wd": "wd5",
+   "site": "apply"
+  },
+  {
+   "company": "Entrata",
+   "type": "lever",
+   "board": "entrata"
+  },
+  {
    "company": "Fanatics",
    "type": "greenhouse",
    "board": "fanaticsinc"
+  },
+  {
+   "company": "Figma",
+   "type": "greenhouse",
+   "board": "figma"
+  },
+  {
+   "company": "FTI Consulting",
+   "type": "workday",
+   "tenant": "fticonsulting",
+   "wd": "wd108",
+   "site": "FTIConsultingCareers"
+  },
+  {
+   "company": "GE Aerospace",
+   "type": "phenom",
+   "host": "careers.geaerospace.com"
+  },
+  {
+   "company": "General Mills",
+   "type": "workday",
+   "tenant": "genmills",
+   "wd": "wd1",
+   "site": "GMI_External_Careers"
   },
   {
    "company": "Google",
@@ -68,6 +282,13 @@
    "url": "https://www.google.com/about/careers/applications/jobs/results",
    "fetch": "manual",
    "note": "Custom careers site. Not auto-fetched. Search it by hand and save postings to workspace/manual/."
+  },
+  {
+   "company": "Guidehouse",
+   "type": "workday",
+   "tenant": "guidehouse",
+   "wd": "wd1",
+   "site": "External"
   },
   {
    "company": "Gumloop",
@@ -80,9 +301,51 @@
    "board": "gusto"
   },
   {
-   "company": "HubSpot",
+   "company": "Hasbro",
    "type": "greenhouse",
-   "board": "hubspotjobs"
+   "board": "hasbro"
+  },
+  {
+   "company": "Headspace",
+   "type": "greenhouse",
+   "board": "hs"
+  },
+  {
+   "company": "Home Depot",
+   "type": "workday",
+   "tenant": "homedepot",
+   "wd": "wd5",
+   "site": "CareerDepot"
+  },
+  {
+   "company": "Honeywell",
+   "type": "oracle",
+   "host": "ibqbjb.fa.ocs.oraclecloud.com",
+   "site": "CX_1"
+  },
+  {
+   "company": "Huron Consulting",
+   "type": "workday",
+   "tenant": "huron",
+   "wd": "wd1",
+   "site": "huroncareers"
+  },
+  {
+   "company": "Instacart",
+   "type": "greenhouse",
+   "board": "instacart"
+  },
+  {
+   "company": "Instructure",
+   "type": "ashby",
+   "board": "instructure"
+  },
+  {
+   "company": "Intel",
+   "type": "workday",
+   "tenant": "intel",
+   "wd": "wd1",
+   "site": "External"
   },
   {
    "company": "Intuit",
@@ -91,11 +354,44 @@
    "note": "Custom careers site. Not auto-fetched. Search it by hand and save postings to workspace/manual/."
   },
   {
+   "company": "Johnson & Johnson",
+   "type": "workday",
+   "tenant": "jj",
+   "wd": "wd5",
+   "site": "JJ"
+  },
+  {
+   "company": "JPMorgan Chase",
+   "type": "oracle",
+   "host": "jpmc.fa.oraclecloud.com",
+   "site": "CX_1001"
+  },
+  {
    "company": "Kantar",
    "type": "workday",
    "tenant": "kantar",
    "wd": "wd3",
    "site": "KANTAR"
+  },
+  {
+   "company": "Kenvue",
+   "type": "workday",
+   "tenant": "kenvue",
+   "wd": "wd5",
+   "site": "kenvue"
+  },
+  {
+   "company": "Kraft Heinz",
+   "type": "workday",
+   "tenant": "heinz",
+   "wd": "wd1",
+   "site": "KraftHeinz_Careers"
+  },
+  {
+   "company": "Kroger",
+   "type": "oracle",
+   "host": "eluq.fa.us2.oraclecloud.com",
+   "site": "CX_2001"
   },
   {
    "company": "LinkedIn",
@@ -108,10 +404,70 @@
    "board": "lovable"
   },
   {
+   "company": "Lowe's",
+   "type": "phenom",
+   "host": "talent.lowes.com"
+  },
+  {
+   "company": "Lucid Software",
+   "type": "greenhouse",
+   "board": "lucidsoftware"
+  },
+  {
+   "company": "Lyft",
+   "type": "greenhouse",
+   "board": "lyft"
+  },
+  {
+   "company": "Marriott",
+   "type": "oracle",
+   "host": "ejwl.fa.us2.oraclecloud.com",
+   "site": "MI_CS_1"
+  },
+  {
+   "company": "Mars",
+   "type": "workday",
+   "tenant": "mars",
+   "wd": "wd3",
+   "site": "External"
+  },
+  {
+   "company": "Mastercard",
+   "type": "workday",
+   "tenant": "mastercard",
+   "wd": "wd1",
+   "site": "CorporateCareers"
+  },
+  {
+   "company": "MasterClass",
+   "type": "greenhouse",
+   "board": "masterclass"
+  },
+  {
+   "company": "Mattel",
+   "type": "smartrecruiters",
+   "board": "MattelInc"
+  },
+  {
+   "company": "Medtronic",
+   "type": "workday",
+   "tenant": "medtronic",
+   "wd": "wd1",
+   "site": "MedtronicCareers"
+  },
+  {
    "company": "Microsoft",
-   "type": "microsoft",
-   "fetch": "manual",
-   "note": "Custom careers site. Not auto-fetched. Search it by hand and save postings to workspace/manual/."
+   "type": "eightfold",
+   "host": "apply.careers.microsoft.com",
+   "domain": "microsoft.com"
+  },
+  {
+   "company": "Mondelez",
+   "type": "workday",
+   "tenant": "mdlz",
+   "wd": "wd3",
+   "site": "External",
+   "host": "wd3.myworkdaysite.com"
   },
   {
    "company": "Music.ai",
@@ -119,14 +475,51 @@
    "board": "moises"
   },
   {
+   "company": "Netflix",
+   "type": "eightfold",
+   "host": "explore.jobs.netflix.net",
+   "domain": "netflix.com",
+   "api": "v2"
+  },
+  {
    "company": "Nielsen",
    "type": "smartrecruiters",
    "board": "TheNielsenCompany"
   },
   {
+   "company": "Nike",
+   "type": "workday",
+   "tenant": "nike",
+   "wd": "wd1",
+   "site": "nke"
+  },
+  {
+   "company": "Notion",
+   "type": "ashby",
+   "board": "notion"
+  },
+  {
+   "company": "NVIDIA",
+   "type": "workday",
+   "tenant": "nvidia",
+   "wd": "wd5",
+   "site": "NVIDIAExternalCareerSite"
+  },
+  {
+   "company": "Okta",
+   "type": "greenhouse",
+   "board": "okta"
+  },
+  {
    "company": "OpenAI",
    "type": "ashby",
    "board": "openai"
+  },
+  {
+   "company": "Oracle",
+   "type": "oracle",
+   "host": "eeho.fa.us2.oraclecloud.com",
+   "site": "jobsearch"
   },
   {
    "company": "Oura",
@@ -141,6 +534,11 @@
    "site": "1000"
   },
   {
+   "company": "Palantir",
+   "type": "lever",
+   "board": "palantir"
+  },
+  {
    "company": "Pattern",
    "type": "lever",
    "board": "pattern"
@@ -151,14 +549,118 @@
    "board": "peloton"
   },
   {
+   "company": "Pfizer",
+   "type": "workday",
+   "tenant": "pfizer",
+   "wd": "wd1",
+   "site": "PfizerCareers"
+  },
+  {
+   "company": "Pinterest",
+   "type": "greenhouse",
+   "board": "pinterest"
+  },
+  {
+   "company": "Pluralsight",
+   "type": "workday",
+   "tenant": "pluralsight",
+   "wd": "wd1",
+   "site": "Careers"
+  },
+  {
+   "company": "PNC",
+   "type": "workday",
+   "tenant": "pnc",
+   "wd": "wd5",
+   "site": "External"
+  },
+  {
+   "company": "Podium",
+   "type": "greenhouse",
+   "board": "podium81"
+  },
+  {
+   "company": "Qualtrics",
+   "type": "greenhouse",
+   "board": "qualtrics"
+  },
+  {
+   "company": "Reddit",
+   "type": "greenhouse",
+   "board": "reddit"
+  },
+  {
+   "company": "Robinhood",
+   "type": "greenhouse",
+   "board": "robinhood"
+  },
+  {
+   "company": "Roblox",
+   "type": "greenhouse",
+   "board": "roblox"
+  },
+  {
+   "company": "Rocket Money",
+   "type": "greenhouse",
+   "board": "truebill"
+  },
+  {
+   "company": "Salesforce",
+   "type": "workday",
+   "tenant": "salesforce",
+   "wd": "wd12",
+   "site": "External_Career_Site"
+  },
+  {
    "company": "SchoolAI",
    "type": "rippling",
    "board": "schoolai"
   },
   {
+   "company": "ServiceNow",
+   "type": "smartrecruiters",
+   "board": "ServiceNow"
+  },
+  {
+   "company": "Snap",
+   "type": "workday",
+   "tenant": "snapchat",
+   "wd": "wd1",
+   "site": "snap",
+   "host": "wd1.myworkdaysite.com"
+  },
+  {
+   "company": "Snowflake",
+   "type": "ashby",
+   "board": "snowflake"
+  },
+  {
+   "company": "SoFi",
+   "type": "greenhouse",
+   "board": "sofi"
+  },
+  {
    "company": "Spotify",
    "type": "lever",
    "board": "spotify"
+  },
+  {
+   "company": "Starbucks",
+   "type": "eightfold",
+   "host": "starbucks.eightfold.ai",
+   "domain": "starbucks.com"
+  },
+  {
+   "company": "State Street",
+   "type": "workday",
+   "tenant": "statestreet",
+   "wd": "wd1",
+   "site": "Global"
+  },
+  {
+   "company": "Strava",
+   "type": "ashby",
+   "board": "strava"
   },
   {
    "company": "Stripe",
@@ -171,9 +673,47 @@
    "board": "suno"
   },
   {
+   "company": "Synchrony",
+   "type": "workday",
+   "tenant": "synchronyfinancial",
+   "wd": "wd5",
+   "site": "careers"
+  },
+  {
+   "company": "Target",
+   "type": "workday",
+   "tenant": "target",
+   "wd": "wd5",
+   "site": "targetcareers"
+  },
+  {
    "company": "The New York Times",
    "type": "greenhouse",
    "board": "thenewyorktimes"
+  },
+  {
+   "company": "Twilio",
+   "type": "greenhouse",
+   "board": "twilio"
+  },
+  {
+   "company": "U.S. Bank",
+   "type": "workday",
+   "tenant": "usbank",
+   "wd": "wd1",
+   "site": "US_Bank_Careers"
+  },
+  {
+   "company": "Unilever",
+   "type": "workday",
+   "tenant": "unilever",
+   "wd": "wd3",
+   "site": "Unilever_Experienced_Professionals"
+  },
+  {
+   "company": "UPS",
+   "type": "phenom",
+   "host": "www.jobs-ups.com"
   },
   {
    "company": "Verizon",
@@ -190,41 +730,115 @@
    "site": "Visa"
   },
   {
+   "company": "Vivint",
+   "type": "smartrecruiters",
+   "board": "vivint"
+  },
+  {
    "company": "Walmart",
    "type": "workday",
    "tenant": "walmart",
    "wd": "wd504",
    "site": "WalmartExternal"
+  },
+  {
+   "company": "Warner Bros. Discovery",
+   "type": "workday",
+   "tenant": "warnerbros",
+   "wd": "wd5",
+   "site": "global"
+  },
+  {
+   "company": "Weave",
+   "type": "ashby",
+   "board": "weave"
+  },
+  {
+   "company": "Wells Fargo",
+   "type": "workday",
+   "tenant": "wf",
+   "wd": "wd1",
+   "site": "WellsFargoJobs"
+  },
+  {
+   "company": "Whoop",
+   "type": "ashby",
+   "board": "whoop"
+  },
+  {
+   "company": "Workday",
+   "type": "workday",
+   "tenant": "workday",
+   "wd": "wd5",
+   "site": "Workday"
+  },
+  {
+   "company": "Zillow",
+   "type": "workday",
+   "tenant": "zillow",
+   "wd": "wd5",
+   "site": "Zillow_Group_External"
   }
  ],
- "not_found_yet": [
-  "Netflix",
-  "Strava",
-  "Calm",
-  "Headspace",
-  "Grammarly",
-  "Rocket Money",
-  "The New York Times",
-  "Whoop",
-  "MasterClass",
-  "Skillshare",
-  "Outschool",
-  "Coursera",
-  "Musicnotes",
-  "Yousician",
-  "Simply Piano",
-  "Pianote",
-  "tonebase",
-  "Notion",
-  "Figma",
-  "Atlassian",
-  "Perplexity",
-  "Anthropic",
-  "OpenAI",
-  "Airbnb",
-  "DoorDash",
-  "Instacart",
-  "Google",
-  "Apple"
- ]
+ "not_found_yet": {
+  "blocks scripts or needs login (search MBA Exchange by hand)": [
+   "McKinsey",
+   "Bain",
+   "Deloitte",
+   "KPMG",
+   "PwC",
+   "EY",
+   "Kearney",
+   "Alvarez & Marsal",
+   "Fidelity",
+   "Northwestern Mutual",
+   "Kimberly-Clark",
+   "Kellanova",
+   "Best Buy",
+   "General Motors",
+   "Apple",
+   "Meta",
+   "Morgan Stanley",
+   "PayPal",
+   "Hershey",
+   "Paramount",
+   "McDonald's",
+   "Electronic Arts",
+   "L'Oréal",
+   "Estée Lauder",
+   "Shopify"
+  ],
+  "public feed exists, no fetcher yet": [
+   "PepsiCo (iCIMS Jibe)",
+   "Costco (iCIMS Jibe)",
+   "ZS Associates (iCIMS Jibe)",
+   "Goldman Sachs (GraphQL)",
+   "Vanguard (Google Talent)",
+   "Capgemini (custom JSON)",
+   "Colgate-Palmolive (SuccessFactors XML)",
+   "TikTok (custom JSON)",
+   "IBM (custom JSON)",
+   "Atlassian (custom JSON)",
+   "Booking Holdings (iCIMS Jibe)"
+  ],
+  "unresolved": [
+   "Atlassian",
+   "Perplexity",
+   "Anthropic",
+   "Eli Lilly",
+   "UnitedHealth Group",
+   "Ford",
+   "Delta",
+   "Charles Schwab",
+   "West Monroe",
+   "Uber",
+   "Zoom",
+   "Grammarly",
+   "Domo",
+   "Etsy",
+   "Expedia",
+   "Wayfair",
+   "HubSpot (board moved)"
+  ]
+ }
 }
