@@ -41,6 +41,13 @@ button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 .trust span { display: block; }
+.trust summary { cursor: pointer; width: fit-content; list-style: none; }
+.trust summary::-webkit-details-marker { display: none; }
+.trust summary::before { content: '›'; display: inline-block; width: 1em; font-size: 16px; line-height: 1; transition: transform .15s; }
+.trust[open] summary::before { transform: rotate(90deg); }
+.trust summary:hover { color: var(--ink); }
+.trust p { margin: 8px 0 0 1em; }
+@media (prefers-reduced-motion: reduce) { .trust summary::before { transition: none; } }
 h1 { font: 500 clamp(32px, 5vw, 46px)/1.1 var(--serif); letter-spacing: -.01em; margin: 0 0 14px; max-width: 18ch; }
 .support { font-size: 17px; max-width: 62ch; margin: 0 0 8px; }
 .support b { font-weight: 600; }
@@ -132,7 +139,7 @@ details.every li .sub { grid-column: 2; }
   <h1 id="verdict"></h1>
   <p class="support" id="support"></p>
   <div id="warn"></div>
-  <p class="trust" id="trust"></p>
+  <details class="trust"><summary>How this was counted</summary><p id="trust"></p></details>
 
   <div class="controls">
     <div class="group"><label id="disc-label">Discipline</label><div class="seg" id="discs" role="group" aria-labelledby="disc-label"></div></div>
@@ -189,12 +196,12 @@ function verdict() {
   const list = runners.length > 1 ? runners.slice(0, -1).join(', ') + ' and ' + runners.at(-1) : runners[0];
   document.getElementById('support').innerHTML =
     `<b>${esc(label[bestK])} (${roles(best.hi)})</b>` + (list ? `, then ${esc(list)}.` : '.') +
-    ` Each count is roles you can be hired into that rank in your top 10%.` +
     (top ? ` The strongest type is <b>${esc(nice(shortSlice(top[0].label)))}</b>: ${top[1].hico} ${top[1].hico === 1 ? 'company has' : 'companies have'} a role like this you could land.` : '');
   if (M.top_share > .4) document.getElementById('warn').innerHTML =
     `<p class="warn"><b>${esc(M.top_co)} is ${Math.round(M.top_share * 100)}% of these postings.</b> ` +
     `Treat this as a read on ${esc(M.top_co)} until more companies are added. Ask Claude to add boards, then rerun.</p>`;
   document.getElementById('trust').innerHTML = [
+    `Each count is roles you can be hired into that rank in your top 10%.`,
     `${(M.n + M.dropped_loc).toLocaleString()} roles searched, ${M.dropped_loc.toLocaleString()} excluded for location.`,
     `Reachable means the title is MBA level or below and any stated minimum is ${M.max_years} years or less.`,
     `Matched against ${M.bank} records in your bank.`,
