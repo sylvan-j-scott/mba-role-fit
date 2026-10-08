@@ -1,0 +1,34 @@
+{
+ "owner": "Your Name",
+ "updated": "2026-10-08",
+ "records": [
+  {
+   "id": "A01",
+   "tag": "pricing test",
+   "role": "Growth Manager, Acme Learning (2021-2024)",
+   "claim": "Ran a 3-arm price test on the annual plan; the winning price lifted revenue per visitor 18% with no drop in conversion.",
+   "what_happened": "Plain-language truth in the user's words. Not resume language.",
+   "numbers": [
+    {"value": "18% revenue per visitor", "how": "Stripe revenue / site visitors, 6-week test, ~9k visitors per arm", "confidence": "verified"}
+   ],
+   "keywords": ["pricing", "a/b testing", "experimentation", "monetization", "revenue", "conversion", "subscription"],
+   "scores": {"impact": 4, "defensibility": 4, "differentiation": 3, "recency": 4},
+   "source": "resume",
+   "versions": ["Resume - PM", "Resume - Marketing"],
+   "harvest_cluster": "C004"
+  },
+  {
+   "id": "A02",
+   "tag": "case comp win",
+   "role": "MBA, 1st year",
+   "claim": "Won the regional round of a supply chain case competition with a network redesign that cut modeled freight cost 11%.",
+   "what_happened": "Team of 4. I built the cost model.",
+   "numbers": [{"value": "11% modeled freight cost", "how": "Our model on the case data; not a real-world result", "confidence": "directional"}],
+   "keywords": ["network design", "logistics", "cost modeling", "excel", "transportation"],
+   "scores": {"impact": 2, "defensibility": 4, "differentiation": 3, "recency": 5},
+   "source": "interview",
+   "versions": [],
+   "harvest_cluster": null
+  }
+ ]
+}

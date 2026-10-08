@@ -1,0 +1,25 @@
+{
+ "name": "finance",
+ "label": "Finance",
+ "mba_exchange_family": [15, 17, 34],
+ "search_terms": ["finance", "fp&a", "corporate development", "investment"],
+ "title_include": "financ(e|ial) (analyst|manager|associate|lead|business partner)|fp&a|financial planning|corporate development|corp dev|treasury|investment bank|investment (associate|analyst|manager)|private equity|venture|equity research|portfolio manager|controller|business finance|strategic finance|m&a|capital markets|credit (analyst|associate)|investor relations|valuation|leveraged finance|finance rotational|finance leadership",
+ "title_exclude": "financial advisor|financial consultant|financial representative|accounts payable|accounts receivable|bookkeep|payroll|loan officer|teller",
+ "mba_level_titles": "^(senior )?(finance|financial) manager|associate\\b|finance rotational|finance leadership|(senior )?financial analyst",
+ "slices": [
+  {"name": "Finance: corporate/FP&A", "title_regex": "fp&a|financial planning|business finance|finance manager|strategic finance|business partner|controller|finance (rotational|leadership)|financial analyst"},
+  {"name": "Finance: corp dev/M&A", "title_regex": "corporate development|corp dev|m&a|mergers"},
+  {"name": "Finance: investment banking", "title_regex": "investment bank|capital markets|leveraged finance|coverage|\\becm\\b|\\bdcm\\b|banker"},
+  {"name": "Finance: investing (PE/VC/asset mgmt)", "title_regex": "portfolio|investment (associate|analyst|manager)|equity research|asset management|hedge|private equity|venture|credit"},
+  {"name": "Finance: treasury/IR", "title_regex": "treasury|investor relations|capital planning"}
+ ],
+ "axes": [
+  {"name": "deal work", "regex": "transaction|deal|due diligence|\\blbo\\b|pitch book|live deals"},
+  {"name": "business partnering", "regex": "business partner|partner with (business|operating|commercial)|advise (business|senior) leaders"}
+ ],
+ "vocabulary": ["financial modeling", "forecasting", "budgeting", "variance analysis", "p&l", "valuation", "dcf",
+  "lbo", "due diligence", "excel", "m&a", "capital allocation", "investment memo", "pitch book", "accounting",
+  "gaap", "cash flow", "working capital", "business partner", "kpi", "board", "investor", "roi",
+  "unit economics", "pricing", "scenario analysis", "sql", "tableau", "power bi", "sap", "cfa", "portfolio",
+  "credit", "capital markets", "long-range plan"]
+}

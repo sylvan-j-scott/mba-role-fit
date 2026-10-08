@@ -1,0 +1,230 @@
+{
+ "updated": "2026-10-08",
+ "about": "Public, no-login job boards. Each entry names the vendor ('type') and the account on that vendor ('board', or tenant/wd/site for Workday). Add your own in workspace/my_boards.json, same shape.",
+ "templates": {
+  "greenhouse": "GET https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true",
+  "lever": "GET https://api.lever.co/v0/postings/{board}?mode=json",
+  "ashby": "GET https://api.ashbyhq.com/posting-api/job-board/{board}",
+  "smartrecruiters": "GET https://api.smartrecruiters.com/v1/companies/{board}/postings?limit=100&offset=N (+ GET .../postings/{id} for body)",
+  "rippling": "GET https://api.rippling.com/platform/api/ats/v1/board/{board}/jobs",
+  "bamboohr": "GET https://{board}.bamboohr.com/careers/list (+ /careers/{id}/detail)",
+  "workday": "POST https://{tenant}.{wd}.myworkdayjobs.com/wday/cxs/{tenant}/{site}/jobs body {\"appliedFacets\":{},\"limit\":20,\"offset\":0,\"searchText\":\"\"}",
+  "amazon": "GET https://www.amazon.jobs/en/search.json?base_query=...&offset=0&result_limit=100",
+  "intuit": "jobs.intuit.com/search-jobs/results (TalentBrew HTML) - see daily-job-brief scripts/fetch_a.py fetch_intuit",
+  "microsoft": "apply.careers.microsoft.com/api/pcsx/search - see daily-job-brief scripts/fetch_a.py fetch_microsoft"
+ },
+ "boards": [
+  {
+   "company": "Airbnb",
+   "type": "greenhouse",
+   "board": "airbnb"
+  },
+  {
+   "company": "Amazon",
+   "type": "amazon"
+  },
+  {
+   "company": "AT&T",
+   "type": "workday",
+   "tenant": "att",
+   "wd": "wd1",
+   "site": "ATTGeneral"
+  },
+  {
+   "company": "Bill",
+   "type": "greenhouse",
+   "board": "billcom"
+  },
+  {
+   "company": "Canva",
+   "type": "smartrecruiters",
+   "board": "canva"
+  },
+  {
+   "company": "Capital One",
+   "type": "workday",
+   "tenant": "capitalone",
+   "wd": "wd12",
+   "site": "Capital_One"
+  },
+  {
+   "company": "Duolingo",
+   "type": "greenhouse",
+   "board": "duolingo"
+  },
+  {
+   "company": "Dust",
+   "type": "ashby",
+   "board": "dust"
+  },
+  {
+   "company": "Fanatics",
+   "type": "greenhouse",
+   "board": "fanaticsinc"
+  },
+  {
+   "company": "Google",
+   "type": "custom-html",
+   "url": "https://www.google.com/about/careers/applications/jobs/results",
+   "fetch": "manual",
+   "note": "Custom careers site. Not auto-fetched. Search it by hand and save postings to workspace/manual/."
+  },
+  {
+   "company": "Gumloop",
+   "type": "ashby",
+   "board": "gumloop"
+  },
+  {
+   "company": "Gusto",
+   "type": "greenhouse",
+   "board": "gusto"
+  },
+  {
+   "company": "HubSpot",
+   "type": "greenhouse",
+   "board": "hubspotjobs"
+  },
+  {
+   "company": "Intuit",
+   "type": "intuit",
+   "fetch": "manual",
+   "note": "Custom careers site. Not auto-fetched. Search it by hand and save postings to workspace/manual/."
+  },
+  {
+   "company": "Kantar",
+   "type": "workday",
+   "tenant": "kantar",
+   "wd": "wd3",
+   "site": "KANTAR"
+  },
+  {
+   "company": "LinkedIn",
+   "type": "smartrecruiters",
+   "board": "LinkedIn3"
+  },
+  {
+   "company": "Lovable",
+   "type": "ashby",
+   "board": "lovable"
+  },
+  {
+   "company": "Microsoft",
+   "type": "microsoft",
+   "fetch": "manual",
+   "note": "Custom careers site. Not auto-fetched. Search it by hand and save postings to workspace/manual/."
+  },
+  {
+   "company": "Music.ai",
+   "type": "bamboohr",
+   "board": "moises"
+  },
+  {
+   "company": "Nielsen",
+   "type": "smartrecruiters",
+   "board": "TheNielsenCompany"
+  },
+  {
+   "company": "OpenAI",
+   "type": "ashby",
+   "board": "openai"
+  },
+  {
+   "company": "Oura",
+   "type": "greenhouse",
+   "board": "oura"
+  },
+  {
+   "company": "P&G",
+   "type": "workday",
+   "tenant": "pg",
+   "wd": "wd5",
+   "site": "1000"
+  },
+  {
+   "company": "Pattern",
+   "type": "lever",
+   "board": "pattern"
+  },
+  {
+   "company": "Peloton",
+   "type": "greenhouse",
+   "board": "peloton"
+  },
+  {
+   "company": "SchoolAI",
+   "type": "rippling",
+   "board": "schoolai"
+  },
+  {
+   "company": "Spotify",
+   "type": "lever",
+   "board": "spotify"
+  },
+  {
+   "company": "Stripe",
+   "type": "greenhouse",
+   "board": "stripe"
+  },
+  {
+   "company": "Suno",
+   "type": "ashby",
+   "board": "suno"
+  },
+  {
+   "company": "The New York Times",
+   "type": "greenhouse",
+   "board": "thenewyorktimes"
+  },
+  {
+   "company": "Verizon",
+   "type": "workday",
+   "tenant": "verizon",
+   "wd": "wd12",
+   "site": "verizon-careers"
+  },
+  {
+   "company": "Visa",
+   "type": "workday",
+   "tenant": "visa",
+   "wd": "wd5",
+   "site": "Visa"
+  },
+  {
+   "company": "Walmart",
+   "type": "workday",
+   "tenant": "walmart",
+   "wd": "wd504",
+   "site": "WalmartExternal"
+  }
+ ],
+ "not_found_yet": [
+  "Netflix",
+  "Strava",
+  "Calm",
+  "Headspace",
+  "Grammarly",
+  "Rocket Money",
+  "The New York Times",
+  "Whoop",
+  "MasterClass",
+  "Skillshare",
+  "Outschool",
+  "Coursera",
+  "Musicnotes",
+  "Yousician",
+  "Simply Piano",
+  "Pianote",
+  "tonebase",
+  "Notion",
+  "Figma",
+  "Atlassian",
+  "Perplexity",
+  "Anthropic",
+  "OpenAI",
+  "Airbnb",
+  "DoorDash",
+  "Instacart",
+  "Google",
+  "Apple"
+ ]
+}

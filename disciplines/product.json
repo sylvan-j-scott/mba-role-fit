@@ -1,0 +1,25 @@
+{
+ "name": "product",
+ "label": "Product Management",
+ "mba_exchange_family": [54],
+ "search_terms": ["product manager"],
+ "title_include": "product manager|product management|product owner|product lead|\\bpm\\b|product strategy",
+ "title_exclude": "product marketing|project manager|product support|product specialist|product design",
+ "mba_level_titles": "^(senior )?product manager\\b|product manager,? (ii|2|mba)|rotational product",
+ "slices": [
+  {"name": "PM: growth", "title_regex": "growth|activation|retention|engagement|lifecycle|onboarding"},
+  {"name": "PM: monetization", "title_regex": "monetiz|pricing|subscription|payments|commerce|revenue|billing|checkout"},
+  {"name": "PM: AI/ML", "title_regex": "\\bai\\b|\\bml\\b|genai|\\bllm\\b|machine learning|generative|agent"},
+  {"name": "PM: platform/technical", "title_regex": "platform|\\bapi\\b|infrastructure|developer|technical|data"},
+  {"name": "PM: B2B/enterprise", "title_regex": "enterprise|b2b|admin|saas|merchant|seller|partner|business"},
+  {"name": "PM: consumer", "title_regex": "consumer|mobile|\\bapp\\b|creator|member|shopping|experience"}
+ ],
+ "axes": [
+  {"name": "owns roadmap/surface", "regex": "own(s|ing|ed)?\\s+(the\\s+)?(roadmap|product area|surface|feature)"}
+ ],
+ "vocabulary": ["roadmap", "prioritization", "a/b testing", "experimentation", "user research", "product strategy",
+  "go-to-market", "sql", "metrics", "okrs", "stakeholder management", "cross-functional", "customer discovery",
+  "requirements", "agile", "launch", "pricing", "monetization", "retention", "engagement", "conversion", "funnel",
+  "data analysis", "machine learning", "api", "platform", "b2b", "saas", "mobile", "payments", "marketplace",
+  "onboarding", "dashboards", "product-led growth", "usability", "prototyping", "engineering", "design"]
+}

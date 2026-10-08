@@ -1,0 +1,26 @@
+{
+ "name": "marketing",
+ "label": "Marketing & Brand",
+ "mba_exchange_family": [20],
+ "search_terms": ["brand manager", "marketing manager", "product marketing", "insights"],
+ "title_include": "brand manager|brand management|brand marketing|marketing|consumer insights?|insights (manager|lead|analyst)|market research|growth (manager|lead)|lifecycle|\\bcrm\\b|e-?commerce manager|category manager|shopper",
+ "title_exclude": "marketing (coordinator|assistant)|telemarketing|marketing designer|marketing engineer",
+ "mba_level_titles": "associate brand manager|assistant brand manager|^brand manager|associate marketing manager|^(senior )?product marketing manager|^marketing manager",
+ "slices": [
+  {"name": "Marketing: brand management", "title_regex": "brand manager|brand management|brand marketing|brand strategy"},
+  {"name": "Marketing: product marketing", "title_regex": "product marketing"},
+  {"name": "Marketing: growth/lifecycle/digital", "title_regex": "growth|lifecycle|retention|\\bcrm\\b|email|acquisition|performance marketing|demand gen|digital|paid|seo|social"},
+  {"name": "Marketing: consumer insights", "title_regex": "insight|market research|consumer research|marketing analytics|marketing science"},
+  {"name": "Marketing: shopper/category/trade", "title_regex": "shopper|category|trade marketing|customer marketing|channel|e-?commerce"}
+ ],
+ "axes": [
+  {"name": "consumer (B2C)", "regex": "consumers?\\b|cpg|consumer packaged|household|shoppers?|d2c|direct-to-consumer"},
+  {"name": "B2B", "regex": "\\bb2b\\b|enterprise|saas|business customers|buyers? journey|pipeline"},
+  {"name": "agency management", "regex": "agenc(y|ies)"}
+ ],
+ "vocabulary": ["brand equity", "positioning", "consumer insights", "p&l", "marketing mix", "go-to-market", "launch",
+  "campaign", "media", "agency", "creative", "segmentation", "pricing", "promotion", "innovation", "portfolio",
+  "forecast", "nielsen", "circana", "a/b testing", "crm", "lifecycle", "retention", "acquisition", "roas", "cac",
+  "ltv", "seo", "paid social", "content", "messaging", "competitive analysis", "market research", "survey",
+  "conjoint", "cross-functional", "budget", "retail", "e-commerce", "dtc", "sales enablement"]
+}

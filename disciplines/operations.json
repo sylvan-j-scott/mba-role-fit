@@ -1,0 +1,25 @@
+{
+ "name": "operations",
+ "label": "Operations & General Management",
+ "mba_exchange_family": [26, 33, 53],
+ "search_terms": ["operations manager", "business operations", "program manager", "general manager"],
+ "title_include": "operations (manager|lead|leader|director|strategy|associate manager)|business operations|bizops|strategy (&|and) operations|general manager|program manager|rotational|leadership development|\\bldp\\b|area manager|site (leader|manager)|plant manager|revenue operations|sales operations|operations excellence",
+ "title_exclude": "it operations|security operations|network operations|clinical operations|store manager",
+ "mba_level_titles": "area manager|senior operations manager|business operations manager|strategy (&|and) operations manager|leadership development|rotational|^program manager|^(senior )?operations manager",
+ "slices": [
+  {"name": "Ops: bizops/strategy & ops", "title_regex": "business operations|bizops|strategy (&|and) operations|operations strategy"},
+  {"name": "Ops: general mgmt/LDP", "title_regex": "general manager|rotational|leadership development|\\bldp\\b"},
+  {"name": "Ops: program management", "title_regex": "program manager|project manager|\\bpmo\\b"},
+  {"name": "Ops: site/plant operations", "title_regex": "site|plant|fulfillment|area manager|facility|distribution|operations manager"},
+  {"name": "Ops: revenue/sales operations", "title_regex": "revenue operations|sales operations|gtm operations|go-to-market operations"}
+ ],
+ "axes": [
+  {"name": "people leadership", "regex": "direct reports|lead a team of|manage a team|people manag|hourly associates|frontline"},
+  {"name": "on-site/shift", "regex": "on-site|onsite|shift|night|weekend|fulfillment center|plant floor"}
+ ],
+ "vocabulary": ["process improvement", "lean", "six sigma", "kpi", "operating cadence", "okrs", "cross-functional",
+  "program management", "project management", "stakeholder management", "sql", "excel", "dashboards",
+  "forecasting", "capacity planning", "cost reduction", "root cause", "continuous improvement",
+  "people management", "headcount", "budget", "p&l", "vendor management", "automation", "scaling",
+  "strategic planning", "executive communication", "data analysis", "change management", "safety"]
+}

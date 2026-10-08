@@ -1,0 +1,26 @@
+{
+ "core": "marketing",
+ "core_note": "The discipline they come from or most expect to target. Gets the companies-by-fit table.",
+ "disciplines": [
+  "product",
+  "consulting",
+  "finance",
+  "marketing",
+  "operations",
+  "supply-chain"
+ ],
+ "disciplines_note": "Default is all six. The sweep is cheap and the report ranks every slice together, which is how a marketer finds the PM or strategy pocket they fit. Narrow only once a direction is clear.",
+ "max_years": 5,
+ "max_years_note": "Your pre-MBA years of full-time work + 2. Roles that state a higher minimum are marked unreachable, not removed.",
+ "location": {
+  "mode": "us"
+ },
+ "location_note": "Pick one mode. \"us\" = US plus postings that name no place (flagged in the report). \"us-strict\" = confirmed US only. \"international\" = outside the US only. \"anywhere\" = no filter. \"custom\" = only named places, e.g. {\"mode\":\"custom\",\"include\":[\"Utah\",\"Salt Lake\",\"Lehi\",\"Provo\",\"Draper\"],\"include_remote\":true}. Any mode can add \"exclude\":[\"New York\"]. Applied when scoring, so changing it never needs a re-fetch.",
+ "companies": "all",
+ "companies_note": "\"all\" = every board in data/boards.json + workspace/my_boards.json. Or a list of company names.",
+ "observable_preferences": [
+  "Example: in-person team (read from the location policy)",
+  "Example: owns a number (P&L, revenue, budget language in the posting)"
+ ],
+ "stopping_budget": "150-250 relevant postings, 12-20 role shapes"
+}

@@ -1,0 +1,27 @@
+{
+ "name": "consulting",
+ "label": "Consulting & Strategy",
+ "mba_exchange_family": [23, 33],
+ "search_terms": ["consultant", "strategy"],
+ "title_include": "consult(ant|ing)|engagement manager|corporate strategy|strategic planning|strategy (associate|manager|consultant|lead|analyst)|chief of staff|advisory (associate|manager|consultant)|transformation (manager|lead)",
+ "title_exclude": "sales consultant|benefits consultant|beauty|leasing|mortgage|financial (consultant|advisor)",
+ "mba_level_titles": "^(senior )?(consultant|associate)$|engagement manager|strategy (associate|manager)",
+ "slices": [
+  {"name": "Consulting: management", "title_regex": "management consult|engagement manager|strategy consult|^(senior )?(consultant|associate)\\b"},
+  {"name": "Consulting: internal strategy", "title_regex": "corporate strategy|strategic planning|strategy (manager|associate|lead|analyst)|chief of staff"},
+  {"name": "Consulting: technology/implementation", "title_regex": "sap|salesforce|oracle|workday|implementation|technology|digital|cloud|\\bit\\b|data|ai\\b"},
+  {"name": "Consulting: operations/transformation", "title_regex": "transformation|operations|process|supply chain|performance improvement|lean"},
+  {"name": "Consulting: deals/financial advisory", "title_regex": "valuation|transaction|restructuring|deal|m&a|financial advisory|economic"}
+ ],
+ "axes": [
+  {"name": "client-facing", "regex": "\\bclients?\\b"},
+  {"name": "heavy travel", "regex": "travel (up to )?(50|60|70|75|80)%|(50|60|70|75|80)% travel|extensive travel"},
+  {"name": "exec audience", "regex": "c-suite|c-level|senior executives|executive leadership"}
+ ],
+ "vocabulary": ["client", "engagement", "hypothesis", "synthesis", "executive presentations", "workstream",
+  "problem solving", "market sizing", "due diligence", "financial modeling", "stakeholder management",
+  "change management", "transformation", "operating model", "cost reduction", "growth strategy", "go-to-market",
+  "pricing", "benchmarking", "workshop", "implementation", "project management", "data analysis", "excel",
+  "powerpoint", "business case", "recommendations", "c-suite", "m&a", "digital transformation", "storyline",
+  "industry research"]
+}

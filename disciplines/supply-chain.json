@@ -1,0 +1,25 @@
+{
+ "name": "supply-chain",
+ "label": "Supply Chain",
+ "mba_exchange_family": [26],
+ "search_terms": ["supply chain", "procurement", "logistics", "demand planning"],
+ "title_include": "supply chain|procurement|sourcing|purchasing|\\bbuyer\\b|demand plan|supply plan|s&op|\\bibp\\b|logistics|transportation|distribution|inventory|fulfillment|manufacturing|materials|commodity|operations research",
+ "title_exclude": "sourcing recruiter|talent sourcing|driver|material handler",
+ "mba_level_titles": "^(senior )?(supply chain|procurement|sourcing|logistics) manager|supply chain (leadership|rotational)",
+ "slices": [
+  {"name": "Supply chain: planning", "title_regex": "demand plan|supply plan|s&op|\\bibp\\b|inventory|forecast|planning"},
+  {"name": "Supply chain: procurement/sourcing", "title_regex": "procure|sourcing|purchasing|buyer|commodity|supplier|vendor"},
+  {"name": "Supply chain: logistics/transport", "title_regex": "logistic|transport|distribution|fulfillment|network|freight|last mile"},
+  {"name": "Supply chain: manufacturing/plant", "title_regex": "manufactur|plant|production|quality|materials"},
+  {"name": "Supply chain: strategy/analytics", "title_regex": "strategy|analytics|optimization|design|transformation|operations research"}
+ ],
+ "axes": [
+  {"name": "supplier-facing", "regex": "suppliers?|vendors?|negotiat"},
+  {"name": "analytics-heavy", "regex": "\\bsql\\b|python|optimization model|linear programming|simulation"}
+ ],
+ "vocabulary": ["s&op", "demand planning", "forecasting", "inventory", "supplier management", "negotiation",
+  "sourcing strategy", "total cost", "cost savings", "logistics", "transportation", "network design", "lean",
+  "six sigma", "erp", "sap", "oracle", "sql", "excel", "kpi", "otif", "fill rate", "lead time", "capacity",
+  "risk", "sustainability", "contract", "category management", "procurement", "operations research",
+  "optimization", "cross-functional"]
+}
