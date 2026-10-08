@@ -88,7 +88,7 @@ Fill `workspace/criteria.json` with them. Before any data comes in:
 
 ## Pass 3. Choose companies and resolve boards
 
-1. Show the companies already in `data/boards.json` (79: tech, CPG, retail, banks, healthcare, industrials).
+1. Show the companies already in `data/boards.json` (128: big tech, SaaS, fintech, CPG, retail, banks, healthcare, industrials, media).
 2. **Ask for their list:** companies they're curious about, plus ones known for hiring their
    discipline. Push for 10-25. For finance, CPG brand, and supply chain, most big
    employers run **Workday** and need one pasted job URL each.
