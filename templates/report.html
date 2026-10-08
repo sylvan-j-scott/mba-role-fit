@@ -40,7 +40,7 @@ a { color: inherit; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-.kicker { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+.trust span { display: block; }
 h1 { font: 500 clamp(32px, 5vw, 46px)/1.1 var(--serif); letter-spacing: -.01em; margin: 0 0 14px; max-width: 18ch; }
 .support { font-size: 17px; max-width: 62ch; margin: 0 0 8px; }
 .support b { font-weight: 600; }
@@ -129,7 +129,6 @@ details.every li .sub { grid-column: 2; }
 </head>
 <body>
 <main>
-  <p class="kicker" id="kicker"></p>
   <h1 id="verdict"></h1>
   <p class="support" id="support"></p>
   <div id="warn"></div>
@@ -184,21 +183,23 @@ function verdict() {
   const [bestK, best] = ranked[0];
   const slices = best.slices.filter(s => !isOther(s.label)).map(s => [s, stats(s)]).sort((a, b) => b[1].hico - a[1].hico || b[1].hi - a[1].hi);
   const top = slices[0];
-  document.getElementById('kicker').textContent =
-    `Where you fit · ${M.n.toLocaleString()} postings from ${M.cos} companies · ${M.loc.replace(/ \+ unplaceable \(flagged\)/, '')}${M.unk ? `, plus ${M.unk} with no clear location` : ''}`;
   document.getElementById('verdict').textContent = `${label[bestK]} fits you best.`;
-  const runners = ranked.slice(1, 3).filter(([, v]) => v.hi > 0).map(([k]) => label[k].toLowerCase());
+  const roles = n => `${n} ${n === 1 ? 'role' : 'roles'}`;
+  const runners = ranked.slice(1).filter(([, v]) => v.hi > 0).sort((a, b) => b[1].hi - a[1].hi).map(([k, v]) => `${label[k].toLowerCase()} (${roles(v.hi)})`);
+  const list = runners.length > 1 ? runners.slice(0, -1).join(', ') + ' and ' + runners.at(-1) : runners[0];
   document.getElementById('support').innerHTML =
-    `<b>${best.hi}</b> roles you can be hired into rank in your top 10%, at ${best.cos} ${best.cos === 1 ? 'company' : 'companies'}.` +
-    (top ? ` The strongest type is <b>${esc(nice(shortSlice(top[0].label)))}</b>: ${top[1].hico} ${top[1].hico === 1 ? 'company has' : 'companies have'} a role like this you could land.` : '') +
-    (runners.length ? ` Next best: ${runners.join(' and ')}.` : '');
+    `<b>${esc(label[bestK])} (${roles(best.hi)})</b>` + (list ? `, then ${esc(list)}.` : '.') +
+    ` Each count is roles you can be hired into that rank in your top 10%.` +
+    (top ? ` The strongest type is <b>${esc(nice(shortSlice(top[0].label)))}</b>: ${top[1].hico} ${top[1].hico === 1 ? 'company has' : 'companies have'} a role like this you could land.` : '');
   if (M.top_share > .4) document.getElementById('warn').innerHTML =
     `<p class="warn"><b>${esc(M.top_co)} is ${Math.round(M.top_share * 100)}% of these postings.</b> ` +
     `Treat this as a read on ${esc(M.top_co)} until more companies are added. Ask Claude to add boards, then rerun.</p>`;
-  document.getElementById('trust').textContent =
-    `Reachable means the title is MBA level or below and any stated minimum is ${M.max_years} years or less. ` +
-    `Matched against ${M.bank} records in your bank. ${M.dropped_loc} postings were outside your location setting` +
-    (M.unk ? `; ${M.unk} kept that list no clear location.` : '.');
+  document.getElementById('trust').innerHTML = [
+    `${(M.n + M.dropped_loc).toLocaleString()} roles searched, ${M.dropped_loc.toLocaleString()} excluded for location.`,
+    `Reachable means the title is MBA level or below and any stated minimum is ${M.max_years} years or less.`,
+    `Matched against ${M.bank} records in your bank.`,
+    ...(M.unk ? [`${M.unk.toLocaleString()} postings don't say where the job is, so they're kept and marked "location unclear."`] : []),
+  ].map(t => `<span>${t}</span>`).join('');
 }
 
 function controls() {
